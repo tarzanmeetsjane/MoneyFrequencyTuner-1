@@ -1,0 +1,87 @@
+modules = ["nodejs-20", "bash", "web", "python-3.11", "postgresql-16"]
+run = "npm run dev"
+hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "node dist/index.js"]
+build = ["sh", "-c", "npm run build"]
+deploymentTarget = "cloudrun"
+
+[env]
+REPLIT_DISABLE_PACKAGE_LAYER = "1"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[workflows]
+runButton = "Start Trading"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "NODE_ENV=production npm run dev"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Train CNN"
+author = 37137062
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python model/cifar_cnn.py"
+
+[[workflows.workflow]]
+name = "Train CNN"
+author = 37137062
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python model/cifar_cnn.py"
+
+[[workflows.workflow]]
+name = "Start Trading"
+author = 37137062
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[rules]
+
+[rules.formatter]
+
+[rules.formatter.fileExtensions]
+
+[rules.formatter.fileExtensions.".ts"]
+id = "module:web/languageServer:typescript-language-server"
+
+[objectStorage]
+defaultBucketID = "replit-objstore-81735706-e4e5-4048-bdd5-ee403c3ee9a2"
+
+[agent]
+integrations = ["javascript_paypal==1.0.0", "javascript_stripe==1.0.0"]
